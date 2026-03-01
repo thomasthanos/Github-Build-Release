@@ -1,6 +1,13 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { FaRocket, FaCopy, FaCheck, FaTrash } from 'react-icons/fa';
 
+// Strip ANSI escape codes from terminal output
+const stripAnsi = (str) => {
+  if (!str) return str;
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, '');
+};
+
 function BuildLogs({ 
   logs, 
   setLogs, 
@@ -13,7 +20,7 @@ function BuildLogs({
   const [isClearing, setIsClearing] = useState(false);
   const [copyError, setCopyError] = useState(false);
 
-  // Auto-scroll όταν υπάρχουν νέα logs
+  // Auto-scroll on new logs
   useEffect(() => {
     if (logEndRef.current && !isClearing) {
       logEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -26,7 +33,6 @@ function BuildLogs({
     
     setIsClearing(true);
     
-    // Μικρή καθυστέρηση για το animation
     setTimeout(() => {
       setLogs('');
       setIsClearing(false);
@@ -38,11 +44,9 @@ function BuildLogs({
     if (!logs) return;
     
     try {
-      await navigator.clipboard.writeText(logs);
+      await navigator.clipboard.writeText(stripAnsi(logs));
       setCopied(true);
       setCopyError(false);
-      
-      // Reset το copied status μετά από 2 δευτερόλεπτα
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -54,32 +58,26 @@ function BuildLogs({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Αποφυγή όταν ο χρήστης γράφει σε input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return;
-      }
+      // Skip when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      // Ctrl + Enter για build
+      // Ctrl+Enter to build
       if (e.ctrlKey && e.key === 'Enter' && !isBuilding && !isClearing) {
         e.preventDefault();
-        console.log('Shortcut: Ctrl+Enter pressed'); // Debug
         handleBuild();
       }
       
-      // Esc για clear
+      // Esc to clear
       if (e.key === 'Escape' && logs && !isBuilding && !isClearing) {
         e.preventDefault();
-        console.log('Shortcut: Escape pressed'); // Debug
         handleClearLogs();
       }
       
-      // Ctrl + C για copy (μόνο όταν υπάρχει selection)
+      // Ctrl+C to copy all (only when no text is selected)
       if (e.ctrlKey && e.key === 'c' && logs && !isClearing) {
-        // Άφησε το default copy να δουλέψει αν υπάρχει selection
         const selection = window.getSelection().toString();
         if (!selection) {
           e.preventDefault();
-          console.log('Shortcut: Ctrl+C pressed (no selection)'); // Debug
           handleCopyLogs();
         }
       }
@@ -99,7 +97,7 @@ function BuildLogs({
         <div className="tab-header-content">
           <h1>Build Console</h1>
           <p className="tab-description">
-            Monitor build process in real-time
+            Monitor the build process in real-time
           </p>
         </div>
         <div className="log-actions" style={{ display: 'flex', gap: '8px' }}>
@@ -195,7 +193,7 @@ function BuildLogs({
           </div>
           <div className="terminal-stats">
             {isBuilding && (
-              <span className="building-indicator">⚡ Building</span>
+              <span className="building-indicator">⚡ Building...</span>
             )}
             <span className="log-count" title={`${charCount} characters`}>
               {lineCount} line{lineCount !== 1 ? 's' : ''}
@@ -218,7 +216,7 @@ function BuildLogs({
           }}
         >
           <pre className="terminal-output" style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-            {logs || "➜ Ready to build. Click 'Run Build' to start."}
+            {stripAnsi(logs) || "➜ Ready to build. Click 'Run Build' to start."}
           </pre>
           <div ref={logEndRef} />
         </div>
@@ -232,8 +230,8 @@ function BuildLogs({
         }}>
           <div className="terminal-hint" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <span><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Run build</span>
-            <span><kbd>Esc</kbd> Clear logs</span>
-            <span><kbd>Ctrl</kbd> + <kbd>C</kbd> Copy all (no selection)</span>
+            <span><kbd>Esc</kbd> Clear</span>
+            <span><kbd>Ctrl</kbd> + <kbd>C</kbd> Copy all</span>
             <span style={{ marginLeft: 'auto' }}>
               {logs ? `${charCount} chars` : 'Ready'}
             </span>

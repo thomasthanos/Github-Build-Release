@@ -231,15 +231,15 @@ function CreateRelease({
           <div className="modal-card modal-card-visible ai-modal">
 
             <div className="modal-header">
-              <div className="modal-icon ai">
-                <FaRobot size={18} />
-              </div>
+              <div className="modal-icon ai"><FaRobot size={16} /></div>
               <div className="modal-header-text">
                 <h3>AI Release Notes</h3>
-                <p>Γράψε τι έκανες και το AI το φτιάχνει σε GitHub format</p>
+                <p>Describe what you did and the AI will format it for GitHub</p>
               </div>
               <button className="modal-close-btn" onClick={() => setShowAiModal(false)}>
-                <FaTimes size={12} />
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
               </button>
             </div>
 
@@ -249,21 +249,21 @@ function CreateRelease({
               <div className="ai-key-section">
                 {savedApiKey && !showKeyInput ? (
                   <div className="ai-key-saved">
-                    <span>🔑 API Key αποθηκευμένο</span>
-                    <button className="ai-key-change" onClick={() => setShowKeyInput(true)}>Αλλαγή</button>
+                    <span>🔑 API Key saved</span>
+                    <button className="ai-key-change" onClick={() => setShowKeyInput(true)}>Change</button>
                   </div>
                 ) : (
                   <div className="ai-key-input-row">
                     <input
                       type="password"
                       className="modern-input"
-                      placeholder="OpenRouter API Key (sk-or-...)"
+                      placeholder="DeepSeek API Key (sk-...)"
                       value={apiKey}
                       onChange={e => setApiKey(e.target.value)}
                     />
                     <button className="ai-save-key-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
                       <FaSave size={12} />
-                      <span>Αποθήκευση</span>
+                      <span>Save</span>
                     </button>
                   </div>
                 )}
@@ -271,10 +271,10 @@ function CreateRelease({
 
               {/* Text input */}
               <div className="ai-text-section">
-                <label className="ai-label">Τι να γράψω στο release;</label>
+                <label className="ai-label">What should I write in the release?</label>
                 <textarea
                   className="ai-textarea custom-scrollbar"
-                  placeholder="π.χ. Έφτιαξα το bug με το login, πρόσθεσα dark mode, βελτίωσα performance στο search..."
+                  placeholder="e.g. Fixed login bug, added dark mode, improved search performance..."
                   value={aiText}
                   onChange={e => { setAiText(e.target.value); setAiError(''); }}
                   rows={5}
@@ -287,13 +287,13 @@ function CreateRelease({
 
             <div className="modal-actions">
               <button className="modal-btn modal-btn-cancel" onClick={() => setShowAiModal(false)} disabled={aiLoading}>
-                Άκυρο
+                Cancel
               </button>
               <button className="modal-btn ai-format-btn" onClick={handleFormatWithAI} disabled={aiLoading || !aiText.trim()}>
                 {aiLoading ? (
-                  <><div className="btn-spinner"></div><span>Φορμάρισμα...</span></>
+                  <><div className="btn-spinner"></div><span>Formatting...</span></>
                 ) : (
-                  <><FaRobot size={13} /><span>Format με AI</span></>
+                  <><FaRobot size={13} /><span>Format with AI</span></>
                 )}
               </button>
             </div>
