@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaInfoCircle, FaTimes, FaRocket } from 'react-icons/fa';
 
 const ICONS = {
@@ -12,31 +12,36 @@ const ICONS = {
 function Toast({ id, type = 'info', title, message, duration = 5000, onClose }) {
   const [isExiting, setIsExiting] = useState(false);
   const [progress, setProgress] = useState(100);
+  const onCloseRef = useRef(onClose);
+  const idRef = useRef(id);
   
   const Icon = ICONS[type] || ICONS.info;
 
+  // Κρατάμε πάντα το latest onClose χωρίς να trigger το effect
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   const handleClose = useCallback(() => {
     setIsExiting(true);
-    setTimeout(() => onClose(id), 300);
-  }, [id, onClose]);
+    setTimeout(() => onCloseRef.current(idRef.current), 300);
+  }, []); // κενό dependency array — δεν αλλάζει ποτέ
 
   useEffect(() => {
-    if (duration > 0) {
-      const startTime = Date.now();
-      const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
-        setProgress(remaining);
-        
-        if (remaining <= 0) {
-          clearInterval(interval);
-          handleClose();
-        }
-      }, 50);
+    if (duration <= 0) return;
 
-      return () => clearInterval(interval);
-    }
-  }, [duration, handleClose]);
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, 100 - (elapsed / duration) * 100);
+      setProgress(remaining);
+      
+      if (remaining <= 0) {
+        clearInterval(interval);
+        handleClose();
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []); // τρέχει μόνο μια φορά στο mount
 
 
   return (

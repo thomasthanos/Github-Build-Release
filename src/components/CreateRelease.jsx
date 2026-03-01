@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkAlerts from 'remark-github-alerts';
 import rehypeRaw from 'rehype-raw';
-import { FaRocket, FaPen, FaTag, FaFileAlt, FaEye, FaEdit, FaTrash, FaMagic } from 'react-icons/fa';
+import { FaRocket, FaPen, FaTag, FaFileAlt, FaEye, FaEdit, FaTrash, FaMagic, FaRobot, FaTimes, FaKey, FaSave } from 'react-icons/fa';
 
 function CreateRelease({
   version,
@@ -20,6 +20,22 @@ function CreateRelease({
 }) {
   const textareaRef = useRef(null);
   const previewRef = useRef(null);
+
+  // AI state
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiText, setAiText] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [savedApiKey, setSavedApiKey] = useState('');
+  const [showKeyInput, setShowKeyInput] = useState(false);
+
+  // Load saved API key on mount
+  useEffect(() => {
+    window.api.getApiKey().then(key => {
+      if (key) setSavedApiKey(key);
+    });
+  }, []);
 
   const handleVersionFocus = () => {
     // Auto-fill version if empty and we have a suggestion
@@ -39,20 +55,36 @@ function CreateRelease({
       textarea.style.height = `${newHeight}px`;
     }
     
-    if (preview && isPreview) {
-      preview.style.height = 'auto';
-      const newHeight = Math.min(Math.max(preview.scrollHeight, 120), 375);
-      preview.style.height = `${newHeight}px`;
-    }
+    // Preview χρησιμοποιεί CSS max-height + overflow-y, όχι δυναμικό ύψος
   }, [notes, isPreview]);
 
-  const generateQuickNotes = () => {
-    const templates = [
-      '### 🚀 What\'s New\n\n- ✨ New feature added\n- 🐛 Bug fixes and improvements\n- ⚡ Performance enhancements\n\n### 📝 Notes\n\n- Please report any issues on GitHub',
-      '### 📦 Release Highlights\n\n- 🎉 Major update with new features\n- 🔧 Various fixes and improvements\n- 📚 Updated documentation\n\n### ⚠️ Breaking Changes\n\n- None',
-      '### ✨ Features\n\n- New functionality\n\n### 🐛 Bug Fixes\n\n- Fixed issue with...\n\n### 🔄 Changes\n\n- Updated dependencies'
-    ];
-    setNotes(templates[Math.floor(Math.random() * templates.length)]);
+  const handleSaveApiKey = async () => {
+    const result = await window.api.saveApiKey(apiKey);
+    if (result.success) {
+      setSavedApiKey(apiKey);
+      setApiKey('');
+      setShowKeyInput(false);
+    }
+  };
+
+  const handleFormatWithAI = async () => {
+    const key = savedApiKey;
+    if (!key) { setShowKeyInput(true); return; }
+    if (!aiText.trim()) { setAiError('Γράψε κάτι πρώτα!'); return; }
+
+    setAiLoading(true);
+    setAiError('');
+
+    const result = await window.api.formatWithAI({ text: aiText, apiKey: key });
+
+    setAiLoading(false);
+    if (result.success) {
+      setNotes(result.result);
+      setShowAiModal(false);
+      setAiText('');
+    } else {
+      setAiError(result.error || 'Something went wrong');
+    }
   };
 
   return (
@@ -130,8 +162,8 @@ function CreateRelease({
                     {notes}
                   </ReactMarkdown>
                 ) : (
-                  <div className="empty-preview">
-                    <FaFileAlt size={32} />
+                  <div className="empty-preview" id="notes-empty-state">
+                    <FaFileAlt size={18} />
                     <p>No content to preview</p>
                   </div>
                 )}
@@ -150,12 +182,12 @@ function CreateRelease({
           <div className="notes-footer">
             <div className="quick-actions">
               <button
-                className="quick-btn"
-                onClick={generateQuickNotes}
-                title="Generate template"
+                className="quick-btn ai-btn"
+                onClick={() => setShowAiModal(true)}
+                title="Format with AI"
               >
-                <FaMagic size={11} />
-                <span>Template</span>
+                <FaRobot size={11} />
+                <span>AI Format</span>
               </button>
               <button
                 className="quick-btn danger"
@@ -193,6 +225,82 @@ function CreateRelease({
           </button>
         </div>
       </div>
+      {/* AI Modal */}
+      {showAiModal && (
+        <div className="modal-backdrop modal-visible" onClick={e => e.target === e.currentTarget && setShowAiModal(false)}>
+          <div className="modal-card modal-card-visible ai-modal">
+
+            <div className="modal-header">
+              <div className="modal-icon ai">
+                <FaRobot size={18} />
+              </div>
+              <div className="modal-header-text">
+                <h3>AI Release Notes</h3>
+                <p>Γράψε τι έκανες και το AI το φτιάχνει σε GitHub format</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowAiModal(false)}>
+                <FaTimes size={12} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+
+              {/* API Key section */}
+              <div className="ai-key-section">
+                {savedApiKey && !showKeyInput ? (
+                  <div className="ai-key-saved">
+                    <span>🔑 API Key αποθηκευμένο</span>
+                    <button className="ai-key-change" onClick={() => setShowKeyInput(true)}>Αλλαγή</button>
+                  </div>
+                ) : (
+                  <div className="ai-key-input-row">
+                    <input
+                      type="password"
+                      className="modern-input"
+                      placeholder="OpenRouter API Key (sk-or-...)"
+                      value={apiKey}
+                      onChange={e => setApiKey(e.target.value)}
+                    />
+                    <button className="ai-save-key-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
+                      <FaSave size={12} />
+                      <span>Αποθήκευση</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Text input */}
+              <div className="ai-text-section">
+                <label className="ai-label">Τι να γράψω στο release;</label>
+                <textarea
+                  className="ai-textarea custom-scrollbar"
+                  placeholder="π.χ. Έφτιαξα το bug με το login, πρόσθεσα dark mode, βελτίωσα performance στο search..."
+                  value={aiText}
+                  onChange={e => { setAiText(e.target.value); setAiError(''); }}
+                  rows={5}
+                />
+              </div>
+
+              {aiError && <div className="error-message">{aiError}</div>}
+
+            </div>
+
+            <div className="modal-actions">
+              <button className="modal-btn modal-btn-cancel" onClick={() => setShowAiModal(false)} disabled={aiLoading}>
+                Άκυρο
+              </button>
+              <button className="modal-btn ai-format-btn" onClick={handleFormatWithAI} disabled={aiLoading || !aiText.trim()}>
+                {aiLoading ? (
+                  <><div className="btn-spinner"></div><span>Φορμάρισμα...</span></>
+                ) : (
+                  <><FaRobot size={13} /><span>Format με AI</span></>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

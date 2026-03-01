@@ -4,11 +4,35 @@ const fs = require('fs');
 const os = require('os');
 const { exec, execFile } = require('child_process');
 
+
 const baseEnv = { ...process.env };
 
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
+
+// Config path για αποθήκευση API key
+let configPath;
+app.whenReady().then(() => {
+    configPath = path.join(app.getPath('userData'), 'grm-config.json');
+});
+
+function readConfig() {
+    try {
+        if (fs.existsSync(configPath)) {
+            return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        }
+    } catch {}
+    return {};
+}
+
+function writeConfig(data) {
+    try {
+        const current = readConfig();
+        fs.writeFileSync(configPath, JSON.stringify({ ...current, ...data }, null, 2));
+        return true;
+    } catch { return false; }
+}
 
 function getBuildCommand(projectPath, overrideCommand) {
     if (overrideCommand && overrideCommand.trim()) return overrideCommand.trim();
@@ -493,6 +517,60 @@ ipcMain.handle('delete-release', async (event, { path: projectPath, tagName }) =
             error: `Unexpected error: ${err.message}`,
             suggestion: 'Check your Git and GitHub CLI configuration'
         };
+    }
+});
+
+// --- AI HANDLERS ---
+
+ipcMain.handle('get-api-key', async () => {
+    const config = readConfig();
+    return config.deepseekApiKey || null;
+});
+
+ipcMain.handle('save-api-key', async (event, apiKey) => {
+    const ok = writeConfig({ deepseekApiKey: apiKey });
+    return { success: ok };
+});
+
+ipcMain.handle('format-with-ai', async (event, { text, apiKey }) => {
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are a GitHub release notes formatter. Format user input into clean, professional GitHub release notes using Markdown.
+Rules:
+- Use ## for main sections (e.g. ## ✨ What's New, ## 🐛 Bug Fixes, ## 🔧 Improvements)
+- Use bullet points with - for each item
+- Add relevant emojis to bullet points
+- Keep it concise and clear
+- Use GitHub-flavored markdown
+- Return ONLY the formatted markdown, no extra explanations`
+                    },
+                    {
+                        role: 'user',
+                        content: text
+                    }
+                ]
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return { success: false, error: data.error?.message || 'API error' };
+        }
+
+        return { success: true, result: data.choices[0].message.content };
+    } catch (err) {
+        return { success: false, error: err.message };
     }
 });
 

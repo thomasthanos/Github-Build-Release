@@ -23,5 +23,10 @@ contextBridge.exposeInMainWorld('api', {
     toggleMaximize: () => ipcRenderer.send('window-toggle-maximize'),
 
     // Theme change for titlebar
-    setTitleBarTheme: (theme) => ipcRenderer.invoke('set-titlebar-theme', theme)
+    setTitleBarTheme: (theme) => ipcRenderer.invoke('set-titlebar-theme', theme),
+
+    // AI formatting
+    getApiKey: () => ipcRenderer.invoke('get-api-key'),
+    saveApiKey: (key) => ipcRenderer.invoke('save-api-key', key),
+    formatWithAI: (data) => ipcRenderer.invoke('format-with-ai', data)
 });
