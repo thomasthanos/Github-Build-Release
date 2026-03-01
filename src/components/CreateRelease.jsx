@@ -249,23 +249,30 @@ function CreateRelease({
               <div className="ai-key-section">
                 {savedApiKey && !showKeyInput ? (
                   <div className="ai-key-saved">
-                    <span>🔑 API Key saved</span>
-                    <button className="ai-key-change" onClick={() => setShowKeyInput(true)}>Change</button>
+                    <FaKey className="ai-key-saved-icon" size={12} />
+                    <span>API Key saved</span>
+                    <button className="ai-key-change-btn" onClick={() => setShowKeyInput(true)}>Change</button>
                   </div>
                 ) : (
-                  <div className="ai-key-input-row">
-                    <input
-                      type="password"
-                      className="modern-input"
-                      placeholder="DeepSeek API Key (sk-...)"
-                      value={apiKey}
-                      onChange={e => setApiKey(e.target.value)}
-                    />
-                    <button className="ai-save-key-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
-                      <FaSave size={12} />
-                      <span>Save</span>
+                  <>
+                    <div className="ai-key-row">
+                      <FaKey className="ai-key-icon" size={12} />
+                      <div className="ai-key-input-wrapper">
+                        <input
+                          type="password"
+                          className="ai-key-input"
+                          placeholder="DeepSeek API Key (sk-...)"
+                          value={apiKey}
+                          onChange={e => setApiKey(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && apiKey && handleSaveApiKey()}
+                        />
+                      </div>
+                    </div>
+                    <button className="ai-key-save-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
+                      <FaSave size={11} />
+                      <span>Save Key</span>
                     </button>
-                  </div>
+                  </>
                 )}
               </div>
 
@@ -276,8 +283,14 @@ function CreateRelease({
                   className="ai-textarea custom-scrollbar"
                   placeholder="e.g. Fixed login bug, added dark mode, improved search performance..."
                   value={aiText}
-                  onChange={e => { setAiText(e.target.value); setAiError(''); }}
-                  rows={5}
+                  ref={el => {
+                    if (el) el.style.height = aiText.trim() ? '300px' : '40px';
+                  }}
+                  onChange={e => {
+                    setAiText(e.target.value);
+                    setAiError('');
+                    e.target.style.height = e.target.value.trim() ? '300px' : '40px';
+                  }}
                 />
               </div>
 
