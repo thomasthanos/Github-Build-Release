@@ -9,6 +9,10 @@ const baseEnv = { ...process.env };
 
 const isDev = process.env.NODE_ENV === 'development';
 
+// Override userData path: AppData/Roaming/ThomasThanos/GithubReleaseManager
+const customUserData = path.join(app.getPath('appData'), 'ThomasThanos', 'GithubReleaseManager');
+app.setPath('userData', customUserData);
+
 let mainWindow;
 
 // Config path για αποθήκευση API key

@@ -278,9 +278,51 @@ function App() {
       {!isAppReady && (
         <div className="app-preloader" aria-live="polite">
           <div className="preloader-card glass-panel">
-            <div className="preloader-spinner" aria-hidden="true"></div>
-            <p>Loading your release cockpit…</p>
+            <div className="preloader-logo" aria-hidden="true">
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Outer ring */}
+                <circle className="preloader-ring-outer" cx="28" cy="28" r="26" stroke="url(#grad1)" strokeWidth="2" strokeLinecap="round" fill="none" />
+                {/* Inner ring */}
+                <circle className="preloader-ring-inner" cx="28" cy="28" r="18" stroke="url(#grad2)" strokeWidth="2" strokeLinecap="round" strokeDasharray="40 74" fill="none" />
+                {/* Rocket icon */}
+                <g className="preloader-icon" transform="translate(28,28)">
+                  <path d="M-2.5-10C-2.5-10 -1-14 0-14S2.5-10 2.5-10L3-2.5C3-1.5 2 0 0 0S-3-1.5-3-2.5Z" fill="url(#grad3)" />
+                  <path d="M-5-2L-3-5L-2.5-2Z" fill="#818cf8" opacity="0.7" />
+                  <path d="M5-2L3-5L2.5-2Z" fill="#818cf8" opacity="0.7" />
+                  <ellipse cx="0" cy="-8" rx="1.2" ry="1.2" fill="#c4b5fd" opacity="0.9" />
+                  {/* Flame */}
+                  <path className="preloader-flame" d="M-1.5 0C-1.5 0 -1 4 0 5.5S1.5 0 1.5 0" fill="url(#grad4)" />
+                </g>
+                {/* Orbit dots */}
+                <circle className="preloader-dot preloader-dot-1" cx="28" cy="2" r="1.5" fill="#6366f1" />
+                <circle className="preloader-dot preloader-dot-2" cx="54" cy="28" r="1.2" fill="#a855f7" />
+                <circle className="preloader-dot preloader-dot-3" cx="28" cy="54" r="1" fill="#10b981" />
+                <defs>
+                  <linearGradient id="grad1" x1="0" y1="0" x2="56" y2="56">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#a855f7" />
+                  </linearGradient>
+                  <linearGradient id="grad2" x1="0" y1="10" x2="56" y2="46">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                  <linearGradient id="grad3" x1="0" y1="-14" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#c4b5fd" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                  <linearGradient id="grad4" x1="0" y1="0" x2="0" y2="5.5">
+                    <stop offset="0%" stopColor="#f59e0b" />
+                    <stop offset="60%" stopColor="#ef4444" />
+                    <stop offset="100%" stopColor="#ef444400" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <p>Loading ReleaseFlow</p>
             <small>Connecting to GitHub and preparing build helpers.</small>
+            <div className="preloader-bar">
+              <div className="preloader-bar-fill"></div>
+            </div>
           </div>
         </div>
       )}

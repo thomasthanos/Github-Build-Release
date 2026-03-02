@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkAlerts from 'remark-github-alerts';
 import rehypeRaw from 'rehype-raw';
-import { FaRocket, FaPen, FaTag, FaFileAlt, FaEye, FaEdit, FaTrash, FaMagic, FaRobot, FaTimes, FaKey, FaSave } from 'react-icons/fa';
+import { FaRocket, FaPen, FaTag, FaFileAlt, FaEye, FaEdit, FaTrash, FaMagic, FaRobot, FaTimes, FaKey, FaSave, FaShieldAlt } from 'react-icons/fa';
 import '../styles/CreateRelease.css';
 
 function CreateRelease({
@@ -248,33 +248,45 @@ function CreateRelease({
 
               {/* API Key section */}
               <div className="ai-key-section">
-                {savedApiKey && !showKeyInput ? (
-                  <div className="ai-key-saved">
-                    <FaKey className="ai-key-saved-icon" size={12} />
-                    <span>API Key saved</span>
-                    <button className="ai-key-change-btn" onClick={() => setShowKeyInput(true)}>Change</button>
+                <div className="ai-key-section-inner">
+                  <div className="ai-key-label">
+                    <FaShieldAlt /> API Configuration
                   </div>
-                ) : (
-                  <>
-                    <div className="ai-key-row">
-                      <FaKey className="ai-key-icon" size={12} />
-                      <div className="ai-key-input-wrapper">
-                        <input
-                          type="password"
-                          className="ai-key-input"
-                          placeholder="DeepSeek API Key (sk-...)"
-                          value={apiKey}
-                          onChange={e => setApiKey(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && apiKey && handleSaveApiKey()}
-                        />
+                  {savedApiKey && !showKeyInput ? (
+                    <div className="ai-key-saved">
+                      <div className="ai-key-saved-icon">
+                        <FaKey size={11} />
                       </div>
+                      <div className="ai-key-saved-text">
+                        <span className="ai-key-saved-title">Key secured</span>
+                        <span className="ai-key-saved-hint">DeepSeek API key is saved locally</span>
+                      </div>
+                      <button className="ai-key-change-btn" onClick={() => setShowKeyInput(true)}>Change</button>
                     </div>
-                    <button className="ai-key-save-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
-                      <FaSave size={11} />
-                      <span>Save Key</span>
-                    </button>
-                  </>
-                )}
+                  ) : (
+                    <>
+                      <div className="ai-key-row">
+                        <div className="ai-key-icon">
+                          <FaKey size={11} />
+                        </div>
+                        <div className="ai-key-input-wrapper">
+                          <input
+                            type="password"
+                            className="ai-key-input"
+                            placeholder="DeepSeek API Key (sk-...)"
+                            value={apiKey}
+                            onChange={e => setApiKey(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && apiKey && handleSaveApiKey()}
+                          />
+                        </div>
+                      </div>
+                      <button className="ai-key-save-btn" onClick={handleSaveApiKey} disabled={!apiKey}>
+                        <FaSave size={11} />
+                        <span>Save Key</span>
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               {/* Text input */}
