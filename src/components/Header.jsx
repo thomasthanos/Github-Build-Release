@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaGithub, FaSun, FaMoon, FaPaintBrush, FaTag } from 'react-icons/fa';
+import '../styles/Header.css';
 
 function Header({ activeTab, theme, toggleTheme }) {
   const getTabTitle = () => {

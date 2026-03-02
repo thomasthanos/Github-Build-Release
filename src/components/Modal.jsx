@@ -11,6 +11,7 @@ import {
   FaFolder,
   FaSpinner,
 } from 'react-icons/fa';
+import '../styles/Modal.css';
 
 /* ─────────────────────────────────────────────
    BASE MODAL

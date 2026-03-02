@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkAlerts from 'remark-github-alerts';
 import rehypeRaw from 'rehype-raw';
 import { FaRocket, FaPen, FaTag, FaFileAlt, FaEye, FaEdit, FaTrash, FaMagic, FaRobot, FaTimes, FaKey, FaSave } from 'react-icons/fa';
+import '../styles/CreateRelease.css';
 
 function CreateRelease({
   version,

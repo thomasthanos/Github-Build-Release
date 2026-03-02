@@ -1,9 +1,10 @@
 import React from 'react';
-import { 
-  FaFolderOpen, FaRocket, FaCodeBranch, 
+import {
+  FaFolderOpen, FaRocket, FaCodeBranch,
   FaTerminal, FaPen, FaSpinner, FaCopy,
   FaFolder
 } from 'react-icons/fa';
+import '../styles/Sidebar.css';
 
 function Sidebar({
   activeTab,

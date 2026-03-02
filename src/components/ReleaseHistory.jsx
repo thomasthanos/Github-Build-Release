@@ -1,8 +1,9 @@
 import React from 'react';
-import { 
+import {
   FaSync, FaSpinner, FaRocket, FaTag, FaTrash,
   FaRegCalendarAlt, FaRegClock, FaCodeBranch, FaExternalLinkAlt
 } from 'react-icons/fa';
+import '../styles/ReleaseHistory.css';
 
 function ReleaseHistory({
   releases,

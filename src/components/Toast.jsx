@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaExclamationTriangle, FaTimesCircle, FaInfoCircle, FaTimes, FaRocket } from 'react-icons/fa';
+import '../styles/Toast.css';
 
 const ICONS = {
   success: FaCheckCircle,

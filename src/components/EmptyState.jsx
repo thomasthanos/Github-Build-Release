@@ -1,8 +1,9 @@
 import React from 'react';
-import { 
+import {
   FaRocket, FaFolderOpen, FaGithub,
   FaCheckCircle, FaExclamationCircle, FaInfoCircle
 } from 'react-icons/fa';
+import '../styles/EmptyState.css';
 
 function EmptyState({ handleSelectFolder, ghStatus }) {
   const isReady = ghStatus.installed && ghStatus.loggedIn;

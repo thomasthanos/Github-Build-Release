@@ -1,0 +1,116 @@
+/* =============================================
+   HEADER STYLES
+   ============================================= */
+
+.app-header {
+  height: 36px !important;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--header-border);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 10000;
+  -webkit-app-region: no-drag;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.logo-icon { color: var(--accent); }
+.brand-highlight {
+  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), #9d4edd);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 90px;
+  position: relative;
+  z-index: 10002;
+  -webkit-app-region: no-drag;
+}
+
+.theme-toggle-with-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  width: 60px; height: 26px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 13px;
+  margin-left: 8px;
+  position: relative;
+  overflow: visible;
+  z-index: 10000;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+.theme-toggle-with-icon:hover {
+  background: var(--border);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.theme-toggle-with-icon .theme-icon {
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+.theme-toggle-with-icon:hover .theme-icon { color: var(--accent); }
+
+/* ── LIGHT THEME ── */
+[data-theme="light"] .app-header {
+  background: rgba(255, 255, 255, 0.98);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .header-center { color: #5a6270; }
+[data-theme="light"] .theme-toggle-with-icon {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #1a1d21;
+}
+[data-theme="light"] .theme-toggle-with-icon:hover { background: rgba(0, 0, 0, 0.05); }

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { FaRocket, FaCopy, FaCheck, FaTrash } from 'react-icons/fa';
+import '../styles/BuildLogs.css';
 
 // Strip ANSI escape codes from terminal output
 const stripAnsi = (str) => {
