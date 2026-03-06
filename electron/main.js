@@ -556,7 +556,8 @@ Rules:
 - Add relevant emojis to bullet points
 - Keep it concise and clear
 - Use GitHub-flavored markdown
-- Return ONLY the formatted markdown, no extra explanations`
+- Return a JSON object with exactly two fields: "title" (a short, professional release title, max 6 words, no version number, no quotes) and "notes" (the formatted markdown)
+- Return ONLY the raw JSON object, no markdown fences, no extra text`
                     },
                     {
                         role: 'user',
@@ -572,7 +573,16 @@ Rules:
             return { success: false, error: data.error?.message || 'API error' };
         }
 
-        return { success: true, result: data.choices[0].message.content };
+        const raw = data.choices[0].message.content.trim();
+        let title = '';
+        let notes = raw;
+        try {
+            const cleaned = raw.replace(/^```[a-z]*\n?/i, '').replace(/```\s*$/i, '').trim();
+            const parsed = JSON.parse(cleaned);
+            title = parsed.title || '';
+            notes = parsed.notes || raw;
+        } catch {}
+        return { success: true, result: notes, title };
     } catch (err) {
         return { success: false, error: err.message };
     }

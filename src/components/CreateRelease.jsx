@@ -81,6 +81,7 @@ function CreateRelease({
     setAiLoading(false);
     if (result.success) {
       setNotes(result.result);
+      if (result.title) setTitle(result.title);
       setShowAiModal(false);
       setAiText('');
     } else {
